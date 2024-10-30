@@ -39,7 +39,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"contracts/Funding.sol": "FundMe"
+			"contracts/FundMe.sol": "FundMe"
 		},
 		"evmVersion": "cancun",
 		"libraries": {},
@@ -53,7 +53,7 @@
 		"remappings": []
 	},
 	"sources": {
-		"contracts/Funding.sol": {
+		"contracts/FundMe.sol": {
 			"keccak256": "0x5ac9233e1d2caf1066d457516c337f88b562c38c95fcdc478f57420f21959afb",
 			"license": "MIT",
 			"urls": [
