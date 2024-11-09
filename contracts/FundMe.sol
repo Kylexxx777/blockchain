@@ -9,12 +9,13 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 contract FundMe{
 
-    uint256 public minimumUsd = 50;
+    uint256 public minimumUsd = 50 * 1e18; // 1 * 10 ** 18
 
     function fund() public payable {
         // Want to be able to set a minimum fund amount in USD
         // 1. How do we send ETH to this contract?
-        require(msg.value >= minimumUsd, "Didn't send enough!"); // 1e18 = 1000000000000000000
+        require(getConversionRate(msg.value) >= minimumUsd, "Didn't send enough!"); // 1e18 = 1000000000000000000
+        // a ton of computation here
     }
 
     function getPrice() public view returns(uint256){
@@ -32,7 +33,13 @@ contract FundMe{
         return priceFeed.version();
     }
 
-    function getConversionRate() public {}
+    function getConversionRate(uint256 ethAmount) public view returns(uint256){
+        uint256 ethPrice = getPrice();
+        //3000.000000000000000000 = ETH / USD price
+        //1_000000000000000000 ETH
+        uint256 ethAmountInUsd = (ethPrice * ethAmount) / 1e18;
+        return ethAmountInUsd;
+    }
 
     // function withdraw(){}
 }
