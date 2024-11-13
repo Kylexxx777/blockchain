@@ -5,41 +5,39 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.27;
 
-import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+import "./PriceConverter.sol";
 
 contract FundMe{
+    using PriceConverter for uint256;
 
     uint256 public minimumUsd = 50 * 1e18; // 1 * 10 ** 18
+
+    address[] public funders;
+    mapping(address => uint256) public addressToAmountFunded;
 
     function fund() public payable {
         // Want to be able to set a minimum fund amount in USD
         // 1. How do we send ETH to this contract?
-        require(getConversionRate(msg.value) >= minimumUsd, "Didn't send enough!"); // 1e18 = 1000000000000000000
+        // msg.value.getConversionRate();
         // a ton of computation here
+        require(msg.value.getConversionRate() >= minimumUsd, "Didn't send enough!"); // 1e18 = 1000000000000000000
+        funders.push(msg.sender);
+        addressToAmountFunded[msg.sender] = msg.value;
     }
 
-    function getPrice() public view returns(uint256){
-        //ABI 
-        //Address 0x694AA1769357215DE4FAC081bf1f309aDC325306
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
-        (, int256 price,,, ) = priceFeed.latestRoundData();
-        //ETH in trms of USD
-        //3000.000000
-        return uint256(price * 1e10);
-    }
+    function withdraw() public {
+        // for loop // start index, ending index, step amount
+        for(uint256 funderIndex = 0; funderIndex < funders.length; funderIndex++){
+            address funder = funders[funderIndex];
+            addressToAmountFunded[funder] = 0;
+        }
+        funders = new address[](0); // reset the array
+        // actually withdraw the funds
+        // transfer // msg.sender = adress // payable(msg.sender) = payable address
+        payable(msg.sender).transfer(address(this).balance);
+        // send 
+        bool sendSuccess = payable(msg.sender).send(address(this).balance);
+        require(sendSuccess, "Send failed");
 
-    function getVersion() public view returns(uint256) {
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
-        return priceFeed.version();
     }
-
-    function getConversionRate(uint256 ethAmount) public view returns(uint256){
-        uint256 ethPrice = getPrice();
-        //3000.000000000000000000 = ETH / USD price
-        //1_000000000000000000 ETH
-        uint256 ethAmountInUsd = (ethPrice * ethAmount) / 1e18;
-        return ethAmountInUsd;
-    }
-
-    // function withdraw(){}
 }
