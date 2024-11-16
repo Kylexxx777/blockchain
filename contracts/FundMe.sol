@@ -3,7 +3,7 @@
 // Set a minimum finding value in USD
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.27;
+pragma solidity ^0.8.0;
 
 import "./PriceConverter.sol";
 
