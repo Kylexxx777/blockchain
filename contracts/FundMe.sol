@@ -7,17 +7,26 @@ pragma solidity ^0.8.0;
 
 import "./PriceConverter.sol";
 
+// create costum error
+error NotOwner();
+
+// constant, immmutable
+//859,757 //683,935
 contract FundMe{
     using PriceConverter for uint256;
 
-    uint256 public minimumUsd = 50 * 1e18; // 1 * 10 ** 18
-
+    uint256 public constant MINIMUM_USD = 50 * 1e18; // 1 * 10 ** 18
+    // 347 - constant // 2446 - w/o constant
+    // 347 * 14100000000 = 4,892,700,000,000 = 0.0000048927 ETH
+    // 2446 * 14100000000 = 34,488,600,000,000 = 0.0000344886 ETH
     address[] public funders;
     mapping(address => uint256) public addressToAmountFunded;
-    address public owner;
+    address public immutable i_owner;
 
     constructor(){
-        owner = msg.sender;
+        i_owner = msg.sender;
+        // 439 gas - immutable // 2574 gas - not immutable
+
     }
 
     function fund() public payable {
@@ -25,7 +34,7 @@ contract FundMe{
         // 1. How do we send ETH to this contract?
         // msg.value.getConversionRate();
         // a ton of computation here
-        require(msg.value.getConversionRate() >= minimumUsd, "Didn't send enough!"); // 1e18 = 1000000000000000000
+        require(msg.value.getConversionRate() >= MINIMUM_USD, "Didn't send enough!"); // 1e18 = 1000000000000000000
         funders.push(msg.sender);
         addressToAmountFunded[msg.sender] = msg.value;
     }
@@ -51,7 +60,20 @@ contract FundMe{
 
     // modifier -> many owners
     modifier onlyOwner{
-        require(msg.sender == owner, "Sender isn't owner!");
+        // require(msg.sender == i_owner, "Sender isn't owner!");
+        if(msg.sender != i_owner) { revert NotOwner(); }
         _; // do other codes in withdraw() afterwards
     }
+
+    // What happens if someone sends this contract ETH w/o calling the fund function
+    // recieve
+    receive() external payable { 
+        fund();
+    }
+
+    //fallback
+    fallback() external payable { 
+        fund();
+    }
+
 }
