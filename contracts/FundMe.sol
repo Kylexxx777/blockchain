@@ -77,3 +77,13 @@ contract FundMe{
     }
 
 }
+
+
+// More to learn
+//1. Enums
+//2. Events
+//3. Try/Catch
+//4. Function Selector
+//5. abi.encode/decode
+//6. Hashing
+//7. Yul/Assembly
