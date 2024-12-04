@@ -79,6 +79,15 @@ contract FundMe{
 }
 
 
+// Limit tinkering / traiaging to 20 mins.
+// Take at least 15 minutes yourself -> or be 100% sure
+// you exhausted all options
+
+// 1. Tineker and try to pinpoint exactly what"s going on
+// 2. Google the exact error
+// 2.5 Go to our Github repo discussions and/or updates
+// 3. Ask a question on a forum like Stack Exchange Eth and Stack Overflow
+
 // More to learn
 //1. Enums
 //2. Events
